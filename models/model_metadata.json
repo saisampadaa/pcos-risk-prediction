@@ -1,0 +1,28 @@
+{
+  "model_type": "logistic_regression",
+  "hyperparameters": {
+    "penalty": "l1",
+    "C": 0.08302175681319744
+  },
+  "random_seed": 42,
+  "training_rows": 2029,
+  "training_patients": 432,
+  "n_features_total": 49,
+  "n_features_nonzero": 26,
+  "cv_metrics": {
+    "accuracy": 0.8684080827994086,
+    "recall_sensitivity": 0.855072463768116,
+    "specificity": 0.8742897727272727,
+    "f1": 0.7990970654627539,
+    "roc_auc": 0.9422291300688038,
+    "pr_auc": 0.904506506117489,
+    "brier_score": 0.09061127772057376
+  },
+  "selection_rationale": "Selected for highest recall among tuned candidates (project priority: minimize missed PCOS cases), competitive PR-AUC/F1, full interpretability for SHAP (Phase 8), smallest train-val overfitting gap (Phase 4), and least-distorted calibration curve. Random Forest (tuned) is the documented runner-up if specificity matters more in practice.",
+  "known_limitations": [
+    "Follicle count and cycle regularity are Rotterdam diagnostic-criterion features, not independently discovered risk factors - expect the model to lean on them heavily.",
+    "holdout_validation is drawn from the same source population as train_pool, not a genuinely independent cohort - see Phase 1 for why.",
+    "Calibration is imperfect (overstates risk somewhat in the 0.3-0.75 predicted range).",
+    "Numeric features are clipped to +/-5 standard deviations after scaling (see src/preprocessing.py ClipStandardized) - found necessary in Phase 8 when a holdout patient's PRG(ng/mL)=85.0 (training max: 25.3) produced a z-score of ~49 and dominated that patient's prediction. Any single feature far enough outside the training range can still influence a prediction more than intended even with this safeguard; extreme inputs at inference time should be treated with caution regardless."
+  ]
+}

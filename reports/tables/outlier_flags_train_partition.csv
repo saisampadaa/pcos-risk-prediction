@@ -1,0 +1,8 @@
+Patient File No.,column,value,PCOS (Y/N),likely_issue
+192.0,Vit D3 (ng/mL),6014.66,1.0,implausibly high (normal range ~20-100 ng/mL)
+196.0,Vit D3 (ng/mL),5418.6,1.0,implausibly high (normal range ~20-100 ng/mL)
+224.0,Pulse rate(bpm) ,18.0,0.0,implausibly low for a living patient
+297.0,Pulse rate(bpm) ,13.0,0.0,implausibly low for a living patient
+330.0,FSH(mIU/mL),5052.0,0.0,implausibly high (likely misplaced decimal/extra digit)
+162.0,BP _Systolic (mmHg),12.0,0.0,implausibly low (likely missing a digit)
+201.0,BP _Diastolic (mmHg),8.0,0.0,implausibly low (likely missing a digit)

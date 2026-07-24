@@ -1,0 +1,44 @@
+standard_feature,lifestyle_col_(2000_row_file),clinical_2_full_col_(541_row_file),clinical_1_col_(541_row_subset),unit_and_definition_note,leakage_or_circularity_note,final_decision,available_in_lifestyle,available_in_clinical_2_full,available_in_clinical_1_subset
+patient_id,Patient File No.,Patient File No.,Patient File No. (+10000 offset),"Same patient, different numbering scheme between clinical_1 and the other two",N/A - identifier,Keep as linkage key only; drop before modeling,True,True,True
+target_pcos,PCOS (Y/N),PCOS (Y/N),PCOS (Y/N),"Identical 1/0 encoding, verified identical labels for the 541 shared patients",This IS the target,Keep as target,True,True,True
+age, Age (yrs), Age (yrs),-,"Same unit (years), identical values for matched patients",None,Keep,True,True,False
+weight,Weight (Kg),Weight (Kg),-,Same unit (Kg); lifestyle values are jittered vs clinical_2,None,Keep,True,True,False
+height,Height(Cm) ,Height(Cm) ,-,Same unit (cm); lifestyle values are jittered vs clinical_2,None,Keep,True,True,False
+bmi,BMI,BMI,-,Same definition (kg/m^2); recompute from height/weight to sanity-check,None,Keep; recompute and cross-check rather than trust as-is,True,True,False
+blood_group,Blood Group,Blood Group,-,"Coded per Instructions sheet: A+=11,A-=12,B+=13,B-=14,O+=15,O-=16,AB+=17,AB-=18",None,"Keep as nominal category; unlikely to carry real signal, include only if EDA shows association",True,True,False
+pulse_rate,Pulse rate(bpm) ,Pulse rate(bpm) ,-,Same unit (bpm),None,Keep; check implausible values (<40) as data-entry errors,True,True,False
+resp_rate,RR (breaths/min),RR (breaths/min),-,Same unit,None,Keep,True,True,False
+hemoglobin,Hb(g/dl),Hb(g/dl),-,Same unit (g/dl),None,Keep,True,True,False
+cycle_regularity,Cycle(R/I),Cycle(R/I),-,Coded R/I -> numeric per Instructions sheet; confirm exact code meaning by checking value_counts,"Part of Rotterdam PCOS diagnostic criteria (oligo/anovulation) - expected to be a strong, legitimate predictor, not leakage",Keep; document as diagnostic-criterion-adjacent feature,True,True,False
+cycle_length,Cycle length(days),Cycle length(days),-,Same unit (days),None,Keep,True,True,False
+marriage_years,Marraige Status (Yrs),Marraige Status (Yrs),-,"Same unit (years); has missing values in both (3 in lifestyle, 1 in clinical_2)",None,Keep; impute,True,True,False
+pregnant,Pregnant(Y/N),Pregnant(Y/N),-,Same 1/0 encoding,"Low risk; fertility status, not a PCOS symptom","Keep, low expected importance",True,True,False
+n_abortions,No. of abortions,No. of aborptions,-,"SAME FEATURE, DIFFERENT SPELLING between files (typo in clinical_2/Instructions: 'aborptions'). Must rename before merging.",Low risk,Keep; standardize name to 'No. of abortions',True,True,False
+beta_hcg_1,  I   beta-HCG(mIU/mL),  I   beta-HCG(mIU/mL),  I   beta-HCG(mIU/mL),Same unit (mIU/mL),"Low risk; used clinically to rule out pregnancy, not a PCOS marker",Keep,True,True,True
+beta_hcg_2,II    beta-HCG(mIU/mL),II    beta-HCG(mIU/mL),II    beta-HCG(mIU/mL),Same unit; has text artifacts ('1.99.') in lifestyle needing numeric coercion,Low risk,Keep after cleaning,True,True,True
+fsh,FSH(mIU/mL),FSH(mIU/mL),-,Same unit,None,Keep; check outliers >100,True,True,False
+lh,LH(mIU/mL),LH(mIU/mL),-,Same unit,None,Keep; check outliers >100,True,True,False
+fsh_lh_ratio,FSH/LH,FSH/LH,-,Derived ratio of the two above,None; but redundant with FSH & LH themselves,"Keep, watch for multicollinearity with FSH/LH",True,True,False
+hip,Hip(inch),Hip(inch),-,Same unit (inch),None,Keep,True,True,False
+waist,Waist(inch),Waist(inch),-,Same unit (inch),None,Keep,True,True,False
+waist_hip_ratio,Waist:Hip Ratio,Waist:Hip Ratio,-,Derived from hip & waist,None; redundant with hip/waist,"Keep, watch multicollinearity",True,True,False
+tsh,TSH (mIU/L),TSH (mIU/L),-,Same unit,None,Keep,True,True,False
+amh,AMH(ng/mL),AMH(ng/mL),AMH(ng/mL),Same unit; has text artifact ('a') in both files needing numeric coercion,"MODERATE circularity risk: AMH is biologically produced by small ovarian follicles and correlates strongly with follicle count, which is itself a diagnostic criterion","Keep after cleaning, but flag in modeling as diagnostic-adjacent; consider a sensitivity model without it",True,True,True
+prl,PRL(ng/mL),PRL(ng/mL),-,Same unit,None,Keep,True,True,False
+vit_d3,Vit D3 (ng/mL),Vit D3 (ng/mL),-,Same unit,None,Keep; check outliers >200,True,True,False
+prg,PRG(ng/mL),PRG(ng/mL),-,Same unit,None,Keep,True,True,False
+rbs,RBS(mg/dl),RBS(mg/dl),-,Same unit; RBS = Random Blood Sugar per Instructions sheet,None,Keep,True,True,False
+weight_gain,Weight gain(Y/N),Weight gain(Y/N),-,"Same 1/0 encoding, self-reported symptom",None,Keep,True,True,False
+hirsutism,hair growth(Y/N),hair growth(Y/N),-,Same 1/0 encoding,Part of Rotterdam criteria (hyperandrogenism proxy) - legitimate predictor,Keep,True,True,False
+skin_darkening,Skin darkening (Y/N),Skin darkening (Y/N),-,Same 1/0 encoding (acanthosis nigricans proxy),"Associated with insulin resistance, legitimate predictor",Keep,True,True,False
+hair_loss,Hair loss(Y/N),Hair loss(Y/N),-,Same 1/0 encoding,"Androgenic alopecia proxy, legitimate predictor",Keep,True,True,False
+acne,Pimples(Y/N),Pimples(Y/N),-,Same 1/0 encoding,Part of Rotterdam criteria (hyperandrogenism proxy),Keep,True,True,False
+fast_food,Fast food (Y/N),Fast food (Y/N),-,"Same 1/0 encoding, lifestyle factor",None,Keep,True,True,False
+exercise,Reg.Exercise(Y/N),Reg.Exercise(Y/N),-,"Same 1/0 encoding, lifestyle factor",None,Keep,True,True,False
+bp_systolic,BP _Systolic (mmHg),BP _Systolic (mmHg),-,Same unit,None,Keep; check implausible values (<50),True,True,False
+bp_diastolic,BP _Diastolic (mmHg),BP _Diastolic (mmHg),-,Same unit,None,Keep; check implausible values (<30),True,True,False
+follicle_left,Follicle No. (L),Follicle No. (L),-,Same unit (count),HIGH circularity risk: follicle count is a literal Rotterdam diagnostic criterion for polycystic ovaries,"Keep for modeling but treat as diagnostic-criterion feature, not an independent risk factor; report models with and without it",True,True,False
+follicle_right,Follicle No. (R),Follicle No. (R),-,Same unit (count),Same HIGH circularity risk as follicle_left,Same as follicle_left,True,True,False
+f_size_left,Avg. F size (L) (mm),Avg. F size (L) (mm),-,Same unit (mm),Related to ultrasound diagnostic criterion,"Keep, same caveat as follicle counts",True,True,False
+f_size_right,Avg. F size (R) (mm),Avg. F size (R) (mm),-,Same unit (mm),Related to ultrasound diagnostic criterion,"Keep, same caveat as follicle counts",True,True,False
+endometrium,Endometrium (mm),Endometrium (mm),-,Same unit (mm),"Ultrasound finding, moderate circularity risk","Keep, same caveat as follicle counts",True,True,False

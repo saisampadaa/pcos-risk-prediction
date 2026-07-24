@@ -1,0 +1,162 @@
+{
+  "Correct high-risk": {
+    "predicted_probability": 0.9999,
+    "risk_category": "Elevated",
+    "top_increasing_factors": [
+      {
+        "feature": "Follicle No. (R)",
+        "value": 20.0,
+        "shap_impact": 4.281578548552138
+      },
+      {
+        "feature": "Follicle No. (L)",
+        "value": 21.0,
+        "shap_impact": 2.0292194818522096
+      },
+      {
+        "feature": "Cycle(R/I)",
+        "value": 4.0,
+        "shap_impact": 0.9279361427195004
+      }
+    ],
+    "top_decreasing_factors": [
+      {
+        "feature": "BP _Diastolic (mmHg)",
+        "value": 80.0,
+        "shap_impact": -0.09270007393544594
+      },
+      {
+        "feature": "BP _Systolic (mmHg)",
+        "value": 120.0,
+        "shap_impact": -0.08687806848993668
+      },
+      {
+        "feature": "Waist:Hip Ratio",
+        "value": 0.8444444444,
+        "shap_impact": -0.07790630263463316
+      }
+    ],
+    "patient_id": 27,
+    "actual_label": "PCOS"
+  },
+  "Correct low-risk": {
+    "predicted_probability": 0.2077,
+    "risk_category": "Lower",
+    "top_increasing_factors": [
+      {
+        "feature": "Follicle No. (R)",
+        "value": 10.0,
+        "shap_impact": 0.9905881192268975
+      },
+      {
+        "feature": "Weight (Kg)",
+        "value": 78.0,
+        "shap_impact": 0.6439529101333626
+      },
+      {
+        "feature": "Marraige Status (Yrs)",
+        "value": 2.0,
+        "shap_impact": 0.3028661025716268
+      }
+    ],
+    "top_decreasing_factors": [
+      {
+        "feature": "PRG(ng/mL)",
+        "value": 85.0,
+        "shap_impact": -1.3195830571328395
+      },
+      {
+        "feature": "Pimples(Y/N)",
+        "value": 0.0,
+        "shap_impact": -0.35247817556922056
+      },
+      {
+        "feature": "Cycle(R/I)",
+        "value": 2.0,
+        "shap_impact": -0.3260316177122569
+      }
+    ],
+    "patient_id": 42,
+    "actual_label": "No PCOS"
+  },
+  "False positive": {
+    "predicted_probability": 0.8038,
+    "risk_category": "Elevated",
+    "top_increasing_factors": [
+      {
+        "feature": "Cycle(R/I)",
+        "value": 4.0,
+        "shap_impact": 0.9279361427195004
+      },
+      {
+        "feature": "Pimples(Y/N)",
+        "value": 1.0,
+        "shap_impact": 0.4137787278421285
+      },
+      {
+        "feature": "Weight gain(Y/N)",
+        "value": 1.0,
+        "shap_impact": 0.3499921250415288
+      }
+    ],
+    "top_decreasing_factors": [
+      {
+        "feature": "Skin darkening (Y/N)",
+        "value": 0.0,
+        "shap_impact": -0.30926537885285105
+      },
+      {
+        "feature": "hair growth(Y/N)",
+        "value": 0.0,
+        "shap_impact": -0.30152299968863727
+      },
+      {
+        "feature": "BP _Diastolic (mmHg)",
+        "value": 80.0,
+        "shap_impact": -0.09270007393544594
+      }
+    ],
+    "patient_id": 378,
+    "actual_label": "No PCOS"
+  },
+  "False negative": {
+    "predicted_probability": 0.0153,
+    "risk_category": "Lower",
+    "top_increasing_factors": [
+      {
+        "feature": "AMH(ng/mL)",
+        "value": 16.9,
+        "shap_impact": 0.5174462821343021
+      },
+      {
+        "feature": "Pulse rate(bpm)",
+        "value": 82.0,
+        "shap_impact": 0.389275955301887
+      },
+      {
+        "feature": "Marraige Status (Yrs)",
+        "value": 5.0,
+        "shap_impact": 0.12853795450660754
+      }
+    ],
+    "top_decreasing_factors": [
+      {
+        "feature": "Follicle No. (R)",
+        "value": 1.0,
+        "shap_impact": -1.9713032671658186
+      },
+      {
+        "feature": "Follicle No. (L)",
+        "value": 1.0,
+        "shap_impact": -0.7410460223828886
+      },
+      {
+        "feature": "Pimples(Y/N)",
+        "value": 0.0,
+        "shap_impact": -0.35247817556922056
+      }
+    ],
+    "patient_id": 445,
+    "actual_label": "PCOS"
+  }
+}
