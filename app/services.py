@@ -28,6 +28,10 @@ from src.explain import (
     build_explainer, build_structured_explanation, categorize_risk, get_preprocessed_frame,
 )
 from src.agent import generate_explanation
+from src.clinical_reference import (
+    bmi_category, describe_clinical_pattern, glucose_flag, hormone_flags, waist_hip_flag,
+    TIERED_GUIDANCE,
+)
 from app.schemas import BLOOD_GROUP_CODES, CYCLE_CODES, PatientInput
 
 # ---------------------------------------------------------------------------
@@ -160,7 +164,40 @@ def predict_and_explain(patient: PatientInput, n_factors: int = 5) -> dict:
     # from X_raw - reuse it directly rather than recomputing here.
     structured["predicted_probability"] = round(proba, 4)
     structured["risk_category"] = categorize_risk(proba)
+    structured["clinical_summary"] = build_clinical_summary(patient, structured["risk_category"])
     return structured
+
+
+def build_clinical_summary(patient: PatientInput, risk_category: str) -> dict:
+    """BMI category, hormone/lab reference-range flags, and a descriptive
+    (non-diagnostic) summary of which clinically-relevant symptom clusters
+    are present - all rule-based, deterministic, and separate from both the
+    SHAP explanation and the LLM agent. See src/clinical_reference.py.
+    """
+    data = patient.model_dump()
+    bmi = data["weight_kg"] / ((data["height_cm"] / 100) ** 2)
+    whr = data["waist_inch"] / data["hip_inch"] if data["hip_inch"] else 0.0
+
+    hormones = hormone_flags({
+        "AMH(ng/mL)": data["amh"],
+        "FSH(mIU/mL)": data["fsh"],
+        "LH(mIU/mL)": data["lh"],
+        "TSH (mIU/L)": data["tsh"],
+        "PRL(ng/mL)": data["prl"],
+        "Vit D3 (ng/mL)": data["vit_d3"],
+    })
+
+    pattern_input = {**data, "bmi": bmi, "waist_hip_ratio": whr}
+    pattern = describe_clinical_pattern(pattern_input)
+
+    return {
+        "bmi": bmi_category(bmi),
+        "hormone_tests": hormones,
+        "glucose": glucose_flag(data["rbs"]),
+        "waist_hip_ratio": waist_hip_flag(whr),
+        "observed_patterns": pattern,
+        "guidance": TIERED_GUIDANCE[risk_category],
+    }
 
 
 def get_model_info() -> dict:

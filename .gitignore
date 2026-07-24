@@ -12,6 +12,6 @@ __pycache__/
 # Large/generated artifacts that shouldn't bloat the repo
 anaconda_projects/db/
 
-# Local Claude Code settings (harness-specific, not project config)
-.claude/settings.local.json
+# Local Claude Code settings/state (harness-specific, not project config)
+.claude/
 

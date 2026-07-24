@@ -103,9 +103,51 @@ class ExplanationResult(BaseModel):
     top_decreasing_factors: List[Factor]
 
 
+class BMISummary(BaseModel):
+    value: float
+    category: str
+    normal_range: str
+
+
+class HormoneFlag(BaseModel):
+    test: str
+    value: float
+    unit: str
+    status: str
+    reference_range: str
+    note: str
+
+
+class RangeFlag(BaseModel):
+    value: float
+    status: str
+    reference_range: str
+    unit: Optional[str] = None
+
+
+class ObservedPatterns(BaseModel):
+    present: List[str]
+    absent: List[str]
+    not_assessed: List[str]
+
+
+class ClinicalSummary(BaseModel):
+    """Rule-based, deterministic - not SHAP output and not the LLM agent's job.
+    See src/clinical_reference.py. Reference ranges are general clinical
+    values, not a substitute for a lab's own reported reference interval.
+    """
+    bmi: BMISummary
+    hormone_tests: List[HormoneFlag]
+    glucose: RangeFlag
+    waist_hip_ratio: RangeFlag
+    observed_patterns: ObservedPatterns
+    guidance: str
+
+
 class PredictResponse(BaseModel):
     prediction: PredictionResult
     explanation: ExplanationResult
+    clinical_summary: ClinicalSummary
     agent_summary: Optional[str] = None
     agent_method: Optional[str] = None
     disclaimer: str

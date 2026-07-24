@@ -71,6 +71,7 @@ def _build_response(patient: PatientInput, include_agent: bool) -> PredictRespon
             top_increasing_factors=structured["top_increasing_factors"],
             top_decreasing_factors=structured["top_decreasing_factors"],
         ),
+        clinical_summary=structured["clinical_summary"],
         agent_summary=agent_summary,
         agent_method=agent_method,
         disclaimer=DISCLAIMER,

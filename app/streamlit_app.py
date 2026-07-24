@@ -143,6 +143,47 @@ if submitted:
     st.caption(f"Explanation method: {agent_result['method']}")
 
     st.markdown("---")
+    st.markdown("## Understanding your result")
+    st.caption(
+        "The sections below are rule-based (not machine-learning output) and use general clinical "
+        "reference ranges - they can vary by lab/assay and are not a substitute for your lab report's "
+        "own reference interval."
+    )
+
+    summary = structured["clinical_summary"]
+
+    st.markdown("### BMI")
+    bmi = summary["bmi"]
+    st.metric("BMI", f"{bmi['value']} kg/m²", bmi["category"])
+    st.caption(f"Normal range: {bmi['normal_range']}")
+
+    st.markdown("### Hormonal tests")
+    for h in summary["hormone_tests"]:
+        flag_color = {"Normal": "green", "High": "red", "Low": "orange"}[h["status"]]
+        st.markdown(f"- **{h['test']}**: {h['value']} {h['unit']} — :{flag_color}[{h['status']}] (reference: {h['reference_range']})")
+        st.caption(h["note"])
+
+    st.markdown("### Metabolic indicators")
+    g = summary["glucose"]
+    w = summary["waist_hip_ratio"]
+    st.markdown(f"- **Random blood sugar**: {g['value']} {g['unit']} — {g['status']} (reference: {g['reference_range']})")
+    st.markdown(f"- **Waist:Hip ratio**: {w['value']} — {w['status']} (reference: {w['reference_range']})")
+
+    st.markdown("### Clinical patterns observed")
+    st.caption("This groups your already-entered values under clinically meaningful headings. It is NOT a PCOS subtype diagnosis.")
+    patterns = summary["observed_patterns"]
+    for p in patterns["present"]:
+        st.markdown(f"✅ {p}")
+    for p in patterns["absent"]:
+        st.markdown(f"⬜ {p}")
+    with st.expander("Not assessed by this tool"):
+        for p in patterns["not_assessed"]:
+            st.markdown(f"- {p}")
+
+    st.markdown("### What this means / next steps")
+    st.info(summary["guidance"])
+
+    st.markdown("---")
     st.warning(
         "This application is an academic decision-support prototype. It does not provide a "
         "medical diagnosis. Risk-category thresholds (Lower < 30%, Moderate 30-70%, Elevated ≥ 70%) "
