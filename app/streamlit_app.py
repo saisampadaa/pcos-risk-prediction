@@ -22,6 +22,83 @@ from src.agent import generate_explanation
 
 st.set_page_config(page_title="PCOS Risk Estimator (Research Prototype)", layout="centered")
 
+# Soft, warm styling - complements .streamlit/config.toml's theme colors.
+# Targets Streamlit's own data-testid hooks (stable across versions) rather
+# than generated class names, and st.container(border=True) for card framing
+# instead of hand-rolled HTML wrappers around widgets.
+st.markdown(
+    """
+    <style>
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #FFFFFF;
+        border-radius: 18px;
+        border: 1px solid #EFE9DE;
+        box-shadow: 0 2px 12px rgba(62, 58, 54, 0.06);
+        padding: 0.25rem 0.5rem;
+    }
+    div[data-testid="stForm"] {
+        background-color: #FFFFFF;
+        border-radius: 18px;
+        border: 1px solid #EFE9DE;
+        box-shadow: 0 2px 12px rgba(62, 58, 54, 0.06);
+        padding: 1.25rem 1.5rem 0.5rem 1.5rem;
+    }
+    div[data-testid="stExpander"] {
+        border-radius: 14px;
+        border: 1px solid #EFE9DE;
+    }
+    .stButton > button, div[data-testid="stFormSubmitButton"] button {
+        border-radius: 999px;
+        border: none;
+        padding: 0.5rem 1.75rem;
+        background-color: #8CA79A;
+        color: white;
+        font-weight: 600;
+    }
+    .stButton > button:hover, div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #79988B;
+        color: white;
+    }
+    div[data-testid="stMetric"] {
+        background-color: #F1EAE0;
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+    }
+    div[data-testid="stAlert"] {
+        border-radius: 14px;
+        border: none;
+    }
+    .soft-pill {
+        display: inline-block;
+        padding: 0.25rem 0.9rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Soft status-pill colors - muted rather than harsh saturated red/orange/green.
+_STATUS_STYLE = {
+    "Lower": ("#E4EFE8", "#3F6D57"),
+    "Normal": ("#E4EFE8", "#3F6D57"),
+    "Moderate": ("#FBEEDD", "#A5722F"),
+    "Borderline (consider follow-up)": ("#FBEEDD", "#A5722F"),
+    "Elevated": ("#FBE7E4", "#B3564C"),
+    "Elevated (central-obesity threshold)": ("#FBEEDD", "#A5722F"),
+    "High": ("#FBE7E4", "#B3564C"),
+    "High (consider follow-up)": ("#FBE7E4", "#B3564C"),
+    "Low": ("#EAEEF7", "#56638A"),
+}
+
+
+def pill(text: str) -> str:
+    bg, fg = _STATUS_STYLE.get(text, ("#F1EAE0", "#3E3A36"))
+    return f'<span class="soft-pill" style="background-color:{bg};color:{fg};">{text}</span>'
+
+
 st.title("PCOS Risk Estimation — Research Prototype")
 st.caption(
     "Academic decision-support tool. Estimates statistical risk from patterns in historical "
@@ -120,30 +197,32 @@ if submitted:
 
     proba_pct = round(structured["predicted_probability"] * 100)
     category = structured["risk_category"]
-    color = {"Lower": "green", "Moderate": "orange", "Elevated": "red"}[category]
 
-    st.markdown("---")
-    st.markdown(f"### Estimated PCOS risk: **{proba_pct}%**")
-    st.markdown(f"### Risk category: :{color}[{category}]")
+    st.write("")
+    with st.container(border=True):
+        st.markdown(f"#### Estimated PCOS risk: **{proba_pct}%**")
+        st.markdown(f"#### Risk category: {pill(category)}", unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("**Main factors increasing the estimate:**")
-        for f in structured["top_increasing_factors"]:
-            st.markdown(f"- {f['feature']} ({f['value']})")
-    with col2:
-        st.markdown("**Factors reducing the estimate:**")
-        for f in structured["top_decreasing_factors"]:
-            st.markdown(f"- {f['feature']} ({f['value']})")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Main factors increasing the estimate:**")
+            for f in structured["top_increasing_factors"]:
+                st.markdown(f"- {f['feature']} ({f['value']})")
+        with col2:
+            st.markdown("**Factors reducing the estimate:**")
+            for f in structured["top_decreasing_factors"]:
+                st.markdown(f"- {f['feature']} ({f['value']})")
 
     with st.spinner("Generating explanation..."):
         agent_result = generate_explanation(structured, use_llm=use_llm)
-    st.markdown("**Explanation:**")
-    st.info(agent_result["explanation"])
-    st.caption(f"Explanation method: {agent_result['method']}")
+    st.write("")
+    with st.container(border=True):
+        st.markdown("**Explanation:**")
+        st.info(agent_result["explanation"])
+        st.caption(f"Explanation method: {agent_result['method']}")
 
-    st.markdown("---")
-    st.markdown("## Understanding your result")
+    st.write("")
+    st.markdown("### Understanding your result")
     st.caption(
         "The sections below are rule-based (not machine-learning output) and use general clinical "
         "reference ranges - they can vary by lab/assay and are not a substitute for your lab report's "
@@ -152,38 +231,57 @@ if submitted:
 
     summary = structured["clinical_summary"]
 
-    st.markdown("### BMI")
-    bmi = summary["bmi"]
-    st.metric("BMI", f"{bmi['value']} kg/m²", bmi["category"])
-    st.caption(f"Normal range: {bmi['normal_range']}")
+    with st.container(border=True):
+        st.markdown("##### BMI")
+        bmi = summary["bmi"]
+        st.metric("BMI", f"{bmi['value']} kg/m²", bmi["category"])
+        st.caption(f"Normal range: {bmi['normal_range']}")
 
-    st.markdown("### Hormonal tests")
-    for h in summary["hormone_tests"]:
-        flag_color = {"Normal": "green", "High": "red", "Low": "orange"}[h["status"]]
-        st.markdown(f"- **{h['test']}**: {h['value']} {h['unit']} — :{flag_color}[{h['status']}] (reference: {h['reference_range']})")
-        st.caption(h["note"])
+    st.write("")
+    with st.container(border=True):
+        st.markdown("##### Hormonal tests")
+        for h in summary["hormone_tests"]:
+            st.markdown(
+                f"- **{h['test']}**: {h['value']} {h['unit']} — {pill(h['status'])} "
+                f"(reference: {h['reference_range']})",
+                unsafe_allow_html=True,
+            )
+            st.caption(h["note"])
 
-    st.markdown("### Metabolic indicators")
-    g = summary["glucose"]
-    w = summary["waist_hip_ratio"]
-    st.markdown(f"- **Random blood sugar**: {g['value']} {g['unit']} — {g['status']} (reference: {g['reference_range']})")
-    st.markdown(f"- **Waist:Hip ratio**: {w['value']} — {w['status']} (reference: {w['reference_range']})")
+    st.write("")
+    with st.container(border=True):
+        st.markdown("##### Metabolic indicators")
+        g = summary["glucose"]
+        w = summary["waist_hip_ratio"]
+        st.markdown(
+            f"- **Random blood sugar**: {g['value']} {g['unit']} — {pill(g['status'])} "
+            f"(reference: {g['reference_range']})",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"- **Waist:Hip ratio**: {w['value']} — {pill(w['status'])} (reference: {w['reference_range']})",
+            unsafe_allow_html=True,
+        )
 
-    st.markdown("### Clinical patterns observed")
-    st.caption("This groups your already-entered values under clinically meaningful headings. It is NOT a PCOS subtype diagnosis.")
-    patterns = summary["observed_patterns"]
-    for p in patterns["present"]:
-        st.markdown(f"✅ {p}")
-    for p in patterns["absent"]:
-        st.markdown(f"⬜ {p}")
-    with st.expander("Not assessed by this tool"):
-        for p in patterns["not_assessed"]:
-            st.markdown(f"- {p}")
+    st.write("")
+    with st.container(border=True):
+        st.markdown("##### Clinical patterns observed")
+        st.caption("This groups your already-entered values under clinically meaningful headings. It is NOT a PCOS subtype diagnosis.")
+        patterns = summary["observed_patterns"]
+        for p in patterns["present"]:
+            st.markdown(f"✅ {p}")
+        for p in patterns["absent"]:
+            st.markdown(f"⬜ {p}")
+        with st.expander("Not assessed by this tool"):
+            for p in patterns["not_assessed"]:
+                st.markdown(f"- {p}")
 
-    st.markdown("### What this means / next steps")
-    st.info(summary["guidance"])
+    st.write("")
+    with st.container(border=True):
+        st.markdown("##### What this means / next steps")
+        st.info(summary["guidance"])
 
-    st.markdown("---")
+    st.write("")
     st.warning(
         "This application is an academic decision-support prototype. It does not provide a "
         "medical diagnosis. Risk-category thresholds (Lower < 30%, Moderate 30-70%, Elevated ≥ 70%) "
